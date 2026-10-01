@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Voice Notes AI</title><link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <main class="shell">
+    <header><div class="eyebrow">LOCAL AI WORKSPACE</div><h1>Voice Notes AI</h1><p>Turn recordings into useful notes using local AI</p></header>
+    <section class="card upload-card">
+      <div class="recorder">
+        <div class="mic" id="record-indicator">●</div>
+        <h2>Record a new voice note</h2>
+        <p>Your microphone stays local and the recording uses the same processing workflow.</p>
+        <div class="record-controls">
+          <button id="record-btn" class="record-button">Start Recording</button>
+          <button id="stop-btn" class="stop-button" hidden>Stop Recording</button>
+          <span id="record-time" class="record-time">00:00</span>
+        </div>
+        <div id="record-preview" class="record-preview" hidden>
+          <audio id="recorded-audio" controls></audio>
+          <a id="download-recording" class="download-link" download>Download recording</a>
+        </div>
+      </div>
+      <div class="divider"><span>OR UPLOAD A FILE</span></div>
+      <div id="dropzone" class="dropzone"><div class="mic">↑</div><h2>Drop your recording here</h2><p>or</p><label class="choose">Choose Audio File<input id="file-input" type="file" accept=".qta,.m4a,.wav,.mp3,.mp4,.webm,.ogg,audio/*"></label><div id="filename" class="filename">Supports QTA, M4A, WAV, MP3, MP4, WebM, and OGG</div></div>
+      <button id="process-btn" class="primary" disabled>Transcribe &amp; Summarize</button>
+      <div id="status" class="status" hidden><div class="spinner"></div><span id="status-text">Uploading audio</span></div>
+      <div id="error" class="error" hidden></div>
+    </section>
+    <section id="results" hidden>
+      <div class="result-heading"><div><div class="eyebrow">ANALYSIS COMPLETE</div><h2>Your notes</h2></div><span id="language" class="pill"></span></div>
+      <div class="grid"><article class="card"><h3>Summary</h3><p id="summary"></p><button class="secondary" data-copy="summary">Copy Summary</button></article><article class="card"><h3>Key Points</h3><ul id="key-points"></ul></article><article class="card"><h3>Decisions</h3><ul id="decisions"></ul></article><article class="card action-card"><h3>Action Items</h3><div class="table-wrap"><table><thead><tr><th>Action</th><th>Owner</th><th>Deadline</th></tr></thead><tbody id="actions"></tbody></table></div></article></div>
+      <article class="card transcript-card"><div class="transcript-head"><h3>Full Transcript</h3><button class="secondary" data-copy="transcript">Copy Transcript</button></div><details><summary>Show transcript</summary><p id="transcript"></p></details></article>
+    </section>
+  </main><script src="/static/app.js"></script>
+</body></html>

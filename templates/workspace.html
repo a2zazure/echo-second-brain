@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Voice Notes AI — Local Second Brain</title>
+  <link rel="stylesheet" href="/static/workspace.css">
+</head>
+<body>
+  <div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
+  <div class="app-shell">
+    <nav class="topbar">
+      <div class="brand"><div class="brand-mark">V</div><div><strong>Voice Notes AI</strong><span>Local second brain</span></div></div>
+      <div class="privacy-badge"><span></span> Private · On-device</div>
+    </nav>
+    <header class="hero">
+      <div><div class="eyebrow">CAPTURE · CONNECT · RECALL</div><h1>Turn every conversation into <em>living memory.</em></h1><p>Record ideas, extract decisions, connect people and projects, then ask your private AI what you knew.</p></div>
+      <div class="hero-stats"><div><strong id="memory-count">0</strong><span>Memories</span></div><div><strong id="relation-count">0</strong><span>Connections</span></div></div>
+    </header>
+    <div class="workspace">
+      <aside class="left-rail">
+        <section class="panel library-panel">
+          <div class="panel-heading"><div><span class="section-kicker">LIBRARY</span><h2>Your memories</h2></div><button id="refresh-memories" class="icon-button" title="Refresh memories">↻</button></div>
+          <label class="search-box"><span>⌕</span><input id="memory-search" type="search" placeholder="Filter memories"></label>
+          <div id="memory-list" class="memory-list"><div class="empty-small">Your processed notes will appear here.</div></div>
+        </section>
+        <section class="panel graph-panel">
+          <div class="panel-heading"><div><span class="section-kicker">KNOWLEDGE GRAPH</span><h2>Connected ideas</h2></div></div>
+          <div id="graph-nodes" class="graph-nodes"><span class="empty-small">Connections grow with every note.</span></div>
+          <div id="graph-relations" class="graph-relations"></div>
+        </section>
+      </aside>
+      <main class="main-column">
+        <section class="panel capture-panel">
+          <div class="capture-head"><div><span class="section-kicker">NEW MEMORY</span><h2>Capture a thought</h2></div><div class="mode-switch"><button class="mode-button active" data-mode="record">● Record</button><button class="mode-button" data-mode="upload">↑ Upload</button></div></div>
+          <div id="record-mode" class="capture-mode active">
+            <div class="recorder-orb" id="record-indicator"><div class="orb-core">●</div><div class="orb-ring"></div></div>
+            <h3 id="record-title">Ready when you are</h3><p>Record a meeting, voice memo, or passing idea. Audio stays on this machine.</p>
+            <div class="record-controls"><button id="record-btn" class="primary-action"><span>●</span> Start recording</button><button id="stop-btn" class="danger-action" hidden><span>■</span> Stop recording</button><span id="record-time" class="record-time">00:00</span></div>
+            <div id="record-preview" class="record-preview" hidden><audio id="recorded-audio" controls></audio><a id="download-recording" class="text-link" download>Download recording</a></div>
+          </div>
+          <div id="upload-mode" class="capture-mode">
+            <div id="dropzone" class="dropzone"><div class="upload-icon">↑</div><h3>Drop a recording here</h3><p>QTA, M4A, WAV, MP3, MP4, WebM, or OGG · up to 500 MB</p><label class="file-button">Choose audio file<input id="file-input" type="file" accept=".qta,.m4a,.wav,.mp3,.mp4,.webm,.ogg,audio/*"></label><div id="filename" class="filename">No file selected</div></div>
+          </div>
+          <button id="process-btn" class="process-button" disabled>Transcribe, understand &amp; remember <span>→</span></button>
+          <div id="status" class="process-status" hidden><div class="status-spinner"></div><div><strong id="status-text">Uploading audio</strong><span>This runs locally. You can keep this page open.</span></div></div>
+          <div id="error" class="error-banner" hidden></div>
+        </section>
+        <section id="welcome-state" class="panel welcome-panel"><div class="welcome-symbol">✦</div><h2>Your notes will become searchable memory</h2><p>Every completed recording is summarized, indexed semantically, and connected to people, projects, topics, and actions.</p><div class="feature-row"><span>Whisper transcription</span><span>Ollama reasoning</span><span>ChromaDB recall</span></div></section>
+        <section id="results" class="results" hidden>
+          <div class="result-title-row"><div><span class="section-kicker">MEMORY SAVED</span><h2 id="note-title">Your notes</h2><div id="note-tags" class="tag-row"></div></div><span id="language" class="language-pill"></span></div>
+          <article class="panel summary-card"><div class="card-icon">✦</div><div><h3>Summary</h3><p id="summary"></p><button class="quiet-button" data-copy="summary">Copy summary</button></div></article>
+          <div class="result-grid"><article class="panel note-card"><h3><span>◆</span> Key points</h3><ul id="key-points"></ul></article><article class="panel note-card"><h3><span>✓</span> Decisions</h3><ul id="decisions"></ul></article></div>
+          <article class="panel actions-card"><h3><span>→</span> Action items</h3><div class="table-wrap"><table><thead><tr><th>Action</th><th>Owner</th><th>Deadline</th></tr></thead><tbody id="actions"></tbody></table></div></article>
+          <article class="panel transcript-card"><div class="transcript-head"><h3>Full transcript</h3><button class="quiet-button" data-copy="transcript">Copy transcript</button></div><details><summary>Open transcript</summary><p id="transcript"></p></details></article>
+        </section>
+      </main>
+      <aside class="right-rail">
+        <section class="panel chat-panel">
+          <div class="chat-head"><div class="assistant-avatar">✦</div><div><span class="section-kicker">SECOND BRAIN</span><h2>Ask your memory</h2></div></div>
+          <div id="chat-messages" class="chat-messages"><div class="chat-bubble assistant">Ask about decisions, people, projects, ideas, or action items across all saved recordings.</div></div>
+          <div class="prompt-chips"><button data-question="What action items are still important?">Open actions</button><button data-question="What decisions have I made recently?">Recent decisions</button><button data-question="Which people and projects appear in my memories?">People &amp; projects</button></div>
+          <form id="chat-form" class="chat-form"><textarea id="chat-input" rows="2" placeholder="Ask your second brain…" required></textarea><button id="chat-send" type="submit" title="Send">↑</button></form>
+          <p class="chat-footnote">Answers are grounded in your local memory library.</p>
+        </section>
+      </aside>
+    </div>
+  </div>
+  <script src="/static/workspace.js"></script>
+</body>
+</html>

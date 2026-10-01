@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#171717">
+  <title>Echo — Your Local Second Brain</title>
+  <link rel="stylesheet" href="/static/dashboard.css">
+  <link rel="stylesheet" href="/static/dashboard-theme.css">
+  <link rel="stylesheet" href="/static/dashboard-fixes.css">
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <a class="brand" href="#home" aria-label="Echo home"><span class="brand-wave">▥</span><span>echo</span></a>
+      <nav class="nav-pill" aria-label="Main navigation">
+        <button class="nav-button active" data-scroll="home" title="Home">⌂</button>
+        <button class="nav-button" data-scroll="recent" title="Memories">▤</button>
+        <button class="nav-button create" id="top-new-note" title="New note" onclick="openModal('note-modal')">＋</button>
+        <button class="nav-button" data-scroll="graph" title="Knowledge graph">◇</button>
+        <button class="nav-button" data-scroll="journal" title="Journal">□</button>
+      </nav>
+      <button class="brain-button" data-scroll="brain"><span>✦</span><strong>Ask your brain</strong></button>
+      <div class="top-actions">
+        <label class="global-search"><span>⌕</span><input id="memory-search" type="search" placeholder="Search memories"></label>
+        <span class="privacy"><i></i> Local only</span>
+        <button class="round-button" id="refresh-button" title="Refresh">↻</button>
+        <div class="avatar" aria-label="Local workspace">E</div>
+      </div>
+    </header>
+
+    <main>
+      <section class="dashboard-grid" id="home">
+        <article class="card recorder-card">
+          <div class="recorder-copy">
+            <span class="eyebrow">QUICK CAPTURE</span>
+            <h1 id="record-title">Tap to start recording</h1>
+            <p>Speak freely. Whisper transcribes it, Ollama understands it, and your memory stays on this Mac.</p>
+          </div>
+          <button id="record-button" class="record-stage" aria-label="Start recording">
+            <span class="wave left-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+            <span class="mic-orb"><span class="mic-icon">●</span></span>
+            <span class="wave right-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+          </button>
+          <div class="record-state"><span id="record-time">00:00</span><span id="record-help">Click the microphone when you are ready</span></div>
+          <div id="record-preview" class="record-preview" hidden>
+            <audio id="recorded-audio" controls></audio>
+            <a id="download-recording" download>Save a copy</a>
+          </div>
+          <footer class="capture-footer">
+            <label class="footer-action">⇧ <span>Upload audio</span><input id="file-input" type="file" accept=".qta,.m4a,.wav,.mp3,.mp4,.webm,.ogg,audio/*"></label>
+            <button class="footer-action" id="new-note-button" onclick="openModal('note-modal')">＋ <span>New text note</span></button>
+          </footer>
+        </article>
+
+        <article class="card journal-card" id="journal">
+          <div class="section-title"><div><span class="eyebrow">DAILY JOURNAL</span><h2>Your memory timeline</h2></div><span id="journal-count" class="count-pill">0 notes</span></div>
+          <div class="journal-layout">
+            <div class="calendar-wrap">
+              <div class="calendar-head"><button id="prev-month" title="Previous month">‹</button><strong id="calendar-month"></strong><button id="next-month" title="Next month">›</button></div>
+              <div class="weekdays"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div>
+              <div id="calendar-days" class="calendar-days"></div>
+            </div>
+            <div class="day-notes">
+              <div class="day-notes-head"><h3 id="selected-day-title">On this day</h3><span id="selected-day-count">0</span></div>
+              <div id="selected-day-list" class="mini-note-list"><p class="empty-copy">Select a highlighted date to revisit a memory.</p></div>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="content-grid">
+        <div class="recent-column" id="recent">
+          <div class="section-title outside"><div><span class="eyebrow">YOUR LIBRARY</span><h2>Recently edited</h2></div><button id="view-all">View all</button></div>
+          <div id="memory-list" class="memory-list"><div class="card empty-card">Your processed notes will appear here.</div></div>
+        </div>
+
+        <aside class="side-column">
+          <article class="card brain-card" id="brain">
+            <div class="section-title"><div><span class="eyebrow">GROUNDED IN YOUR NOTES</span><h2>Ask your second brain</h2></div><div class="ai-dot">✦</div></div>
+            <div id="chat-messages" class="chat-messages"><div class="message assistant">Ask about decisions, people, projects, ideas, or action items across all saved memories.</div></div>
+            <div class="suggestions"><button data-question="What should I follow up on?">Open actions</button><button data-question="What did I decide recently?">Recent decisions</button></div>
+            <form id="chat-form" class="chat-form"><textarea id="chat-input" rows="2" placeholder="Ask anything about your memories…" required></textarea><button id="chat-send" title="Send">↑</button></form>
+          </article>
+
+          <article class="card graph-card" id="graph">
+            <div class="section-title"><div><span class="eyebrow">KNOWLEDGE GRAPH</span><h2>Ideas that connect</h2></div><button id="open-graph" class="graph-open">Explore graph <span>↗</span></button></div>
+            <div id="graph-cloud" class="graph-cloud"><p class="empty-copy">Connections will grow with every note.</p></div>
+            <div class="graph-footer"><span id="graph-count" class="count-pill">0 links</span><p id="graph-relation" class="graph-relation"></p></div>
+          </article>
+        </aside>
+      </section>
+    </main>
+  </div>
+
+  <div id="process-overlay" class="overlay" hidden>
+    <div class="process-dialog">
+      <div class="processing-mark"><i></i><i></i><i></i><i></i><i></i></div>
+      <span class="eyebrow">BUILDING YOUR MEMORY</span>
+      <h2 id="status-text">Uploading audio</h2>
+      <p id="status-detail">Audio stays local. Keep this tab open while the work finishes.</p>
+      <div class="progress-track"><span id="progress-fill"></span></div>
+    </div>
+  </div>
+
+  <div id="note-modal" class="overlay" hidden>
+    <form id="note-form" class="modal note-editor">
+      <button type="button" class="modal-close" data-close="note-modal">×</button>
+      <span class="eyebrow">QUICK NOTE</span><h2>Write it down</h2>
+      <label>Title <input id="quick-title" maxlength="200" placeholder="Optional title"></label>
+      <label>Note <textarea id="quick-content" rows="11" required placeholder="Idea, journal entry, meeting note, something to remember…"></textarea></label>
+      <button id="save-note" class="primary-button">Understand &amp; save to memory <span>→</span></button>
+    </form>
+  </div>
+
+  <div id="detail-modal" class="overlay detail-overlay" hidden>
+    <article class="modal memory-detail">
+      <button type="button" class="modal-close" data-close="detail-modal">×</button>
+      <div class="detail-head"><div><span class="eyebrow">SAVED MEMORY</span><h2 id="detail-title"></h2><div id="detail-tags" class="tags"></div></div><span id="detail-date" class="count-pill"></span></div>
+      <section class="detail-summary"><h3>Summary</h3><p id="detail-summary"></p></section>
+      <div class="detail-grid"><section><h3>Key points</h3><ul id="detail-points"></ul></section><section><h3>Decisions</h3><ul id="detail-decisions"></ul></section></div>
+      <section><h3>Action items</h3><div id="detail-actions" class="action-list"></div></section>
+      <details><summary>Full transcript</summary><p id="detail-transcript" class="transcript"></p></details>
+    </article>
+  </div>
+
+  <div id="graph-modal" class="overlay" hidden>
+    <article class="modal graph-explorer">
+      <button type="button" class="modal-close" data-close="graph-modal">×</button>
+      <div class="detail-head"><div><span class="eyebrow">KNOWLEDGE GRAPH</span><h2>Explore your connected memory</h2><p class="explorer-intro">Select a node to see what it connects to and which memories mention it.</p></div><span id="explorer-count" class="count-pill"></span></div>
+      <div class="explorer-layout">
+        <div id="graph-stage" class="graph-stage"><svg id="graph-svg" role="img" aria-label="Interactive knowledge graph"></svg></div>
+        <aside id="graph-inspector" class="graph-inspector"><span class="eyebrow">SELECTED NODE</span><h3 id="selected-node-title">Choose a topic</h3><p id="selected-node-type" class="inspector-type">Click any node in the graph.</p><div id="selected-node-connections" class="inspector-connections"></div><div><span class="eyebrow">MENTIONED IN</span><div id="selected-node-memories" class="inspector-memories"><p class="empty-copy">No node selected.</p></div></div></aside>
+      </div>
+    </article>
+  </div>
+
+  <div id="toast" class="toast" hidden></div>
+  <script src="/static/dashboard.js?v=semantic3"></script>
+</body>
+</html>
